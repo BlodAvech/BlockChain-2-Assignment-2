@@ -1,0 +1,46 @@
+name: Foundry CI
+
+on:
+  push:
+    branches: ["master", "main"]
+  pull_request:
+    branches: ["master", "main"]
+
+jobs:
+  test:
+    name: Run Foundry Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: stable
+
+      - name: Compile contracts
+        run: forge build --sizes
+
+      - name: Run all tests
+        run: forge test -vv
+        env:
+          ETH_RPC_URL: ${{ secrets.ETH_RPC_URL }}
+
+      - name: Generate gas report
+        run: forge test --gas-report
+        env:
+          ETH_RPC_URL: ${{ secrets.ETH_RPC_URL }}
+
+      - name: Generate coverage report
+        run: forge coverage --report summary
+
+      - name: Run Slither analysis
+        uses: crytic/slither-action@v0.4.0
+        with:
+          target: src/
+          slither-args: --exclude-dependencies
+        continue-on-error: true
