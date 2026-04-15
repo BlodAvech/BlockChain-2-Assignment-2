@@ -20,7 +20,7 @@ jobs:
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
         with:
-          version: stable
+          version: nightly
 
       - name: Compile contracts
         run: forge build --sizes
@@ -37,6 +37,8 @@ jobs:
 
       - name: Generate coverage report
         run: forge coverage --report summary
+        env:
+          ETH_RPC_URL: ${{ secrets.ETH_RPC_URL }}
 
       - name: Run Slither analysis
         uses: crytic/slither-action@v0.4.0
