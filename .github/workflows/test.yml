@@ -25,13 +25,16 @@ jobs:
       - name: Compile contracts
         run: forge build --sizes
 
-      - name: Run all tests
-        run: forge test -vv
+      - name: Run unit and fuzz tests
+        run: forge test -vv --no-match-path "src/MyTokenInvariant.t.sol"
         env:
           ETH_RPC_URL: ${{ secrets.ETH_RPC_URL }}
 
+      - name: Run invariant tests
+        run: forge test -vv --match-path "src/MyTokenInvariant.t.sol"
+
       - name: Generate gas report
-        run: forge test --gas-report
+        run: forge test --gas-report --no-match-path "src/MyTokenInvariant.t.sol"
         env:
           ETH_RPC_URL: ${{ secrets.ETH_RPC_URL }}
 
